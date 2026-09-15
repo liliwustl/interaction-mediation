@@ -1,3 +1,13 @@
+library(MASS)
+library(mvtnorm)
+library(MASS)
+library(abind)
+library(pracma)
+library(qs)##qread
+library(haven)
+library(dplyr)
+library(data.table)
+library(readr)
 ####### coordinate descent algorithm ##########
 cd.general <- function(X, y, exposure,Z,a0, beta, epsilon, max.iter, lambda, family, bInd, pf, 
                        pentype, gamma) {
@@ -457,21 +467,9 @@ HIMA=function(X, M, Y,COV){
   }
   return(out_result)
 }
-
-
-library(MASS)
-library(mvtnorm)
-library(MASS)
-library(abind)
-library(pracma)
-library(qs)##qread
-library(haven)
-library(dplyr)
-library(data.table)
-library(readr)
-options(max.print=20000)
-Y_impute=read.csv("C:/Users/lili/OneDrive - Washington University in St. Louis/Desktop/agedata/Y_impute.csv",check.names = FALSE)
-link=read.csv("C:/Users/lili/OneDrive - Washington University in St. Louis/Desktop/agedata/CARDIA_linkTable.csv",check.names = FALSE)
+                     
+Y_impute=read.csv("~/Y_impute.csv",check.names = FALSE)
+link=read.csv("~/CARDIA_linkTable.csv",check.names = FALSE)
 code1<- colnames(Y_impute)[!is.na(match(colnames(Y_impute),link$BARCODE))]
 Y_impute=Y_impute[,code1]
 link15=link[link$Visit=="Y15",]
@@ -490,8 +488,8 @@ M15=t(Y15)
 M20=t(Y20)
 M25=t(Y25)
 M30=t(Y30)
-PC=read.csv("C:/Users/lili/OneDrive - Washington University in St. Louis/Desktop/agedata/PC.csv",check.names = FALSE)
-cell=read.csv("C:/Users/lili/OneDrive - Washington University in St. Louis/Desktop/agedata/cellProp.csv",check.names = FALSE)
+PC=read.csv("~/PC.csv",check.names = FALSE)
+cell=read.csv("~/cellProp.csv",check.names = FALSE)
 PC15=PC[match(link15$BARCODE,PC$BARCODE),]
 PC15$CARDIA_long=link$CARDIA_long[match(PC15$BARCODE,link$BARCODE)]
 PC20=PC[match(link20$BARCODE,PC$BARCODE),]
@@ -508,12 +506,11 @@ cell25=cell[match(link25$BARCODE,cell$BARCODE),]
 cell25$CARDIA_long=link$CARDIA_long[match(cell25$BARCODE,link$BARCODE)]
 cell30=cell[match(link30$BARCODE,cell$BARCODE),]
 cell30$CARDIA_long=link$CARDIA_long[match(cell30$BARCODE,link$BARCODE)]
-Data=read_sas("C:/Users/lili/OneDrive - Washington University in St. Louis/Desktop/agedata/y0_10_covariate.sas7bdat")
-cvd=read_sas("C:/Users/lili/OneDrive - Washington University in St. Louis/Desktop/agedata/cac_2025.sas7bdat")
+Data=read_sas("~/y0_10_covariate.sas7bdat")
+cvd=read_sas("~/cac_2025.sas7bdat")
 cac=data.frame(ID=cvd$ID,Y25cac=cvd$Y25cactot,Y20cac=cvd$Y20cactot)
 cac=cac%>%filter(!is.na(Y20cac))
-nsdh_indexs=read_sas("C:/Users/lili/OneDrive - Washington University in St. Louis/Desktop/agedata/nsdh_1210.sas7bdat")
-######################################using the mean of Y0,Y10##################
+nsdh_indexs=read_sas("~/nsdh_1210.sas7bdat")
 nsdh_indexs=nsdh_indexs %>%filter( !is.na(nSDH_index0))%>%filter( !is.na(nSDH_index10))%>%filter( !is.na(nSDH_index15))
 id=intersect(intersect(cac$ID,intersect(nsdh_indexs$ID,Data$ID)),Reduce(union,list(rownames(M15), rownames(M20), rownames(M25), rownames(M30))))
 n=length(id)
